@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sirius/sign_in.dart';
 import 'package:sirius/sign_up.dart';
-
 class Authenticate extends StatefulWidget {
   @override
   _AuthenticateState createState() => _AuthenticateState();
