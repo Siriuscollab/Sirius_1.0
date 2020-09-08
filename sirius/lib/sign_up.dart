@@ -113,8 +113,8 @@ class _SignUpState extends State<SignUp> {
         if( _password== _password1) {
           FirebaseAuth _auth= FirebaseAuth.instance;
           AuthResult result=await _auth.createUserWithEmailAndPassword(email: _email, password: _password);
+          FirebaseUser user= await FirebaseAuth.instance.currentUser();
           if(result!=null) {
-            FirebaseUser user= await FirebaseAuth.instance.currentUser();
             await dbref.child('users').child(user.uid).set({
               'email': _email,
               'username': _username.text,
@@ -123,7 +123,7 @@ class _SignUpState extends State<SignUp> {
           }
           Phoneauth();
           Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Home()));
+          context, MaterialPageRoute(builder: (context) => Home(uid: user.uid)));
         }
       }catch(e){
         print(e.message);

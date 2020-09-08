@@ -1,79 +1,42 @@
 {
   "project_info": {
-    "project_number": "698877920515",
-    "firebase_url": "https://focal-48c13.firebaseio.com",
-    "project_id": "focal-48c13",
-    "storage_bucket": "focal-48c13.appspot.com"
+    "project_number": "1059896166848",
+    "firebase_url": "https://sirius-90dea.firebaseio.com",
+    "project_id": "sirius-90dea",
+    "storage_bucket": "sirius-90dea.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:698877920515:android:28d4e966ce1e851b3b1536",
-        "android_client_info": {
-          "package_name": "com.example.flutter_app_fire"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "698877920515-bkjkvo41s5frgsrc337kln7aecf8jou9.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.flutter_app_fire",
-            "certificate_hash": "38839601c0abc45ab14a84222d60bd00501e99bc"
-          }
-        },
-        {
-          "client_id": "698877920515-j7fnao4np0g52q2p567516b7nmgh3epj.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAWfXue3H7fsVK4V6ybR2d_dMOgbyApsJ0"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "698877920515-j7fnao4np0g52q2p567516b7nmgh3epj.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:698877920515:android:579552764e779f663b1536",
+        "mobilesdk_app_id": "1:1059896166848:android:2ab8aa9c4da9166c54a025",
         "android_client_info": {
           "package_name": "com.example.sirius"
         }
       },
       "oauth_client": [
         {
-          "client_id": "698877920515-0tkq016cf1uqjl02snf36q7jgupp229c.apps.googleusercontent.com",
+          "client_id": "1059896166848-malrnh578l7rrnskp4an8mn2bcfvljc4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.sirius",
-            "certificate_hash": "38839601c0abc45ab14a84222d60bd00501e99bc"
+            "certificate_hash": "56fa61894a660224ab63b380dd2f6486aa78cf76"
           }
         },
         {
-          "client_id": "698877920515-j7fnao4np0g52q2p567516b7nmgh3epj.apps.googleusercontent.com",
+          "client_id": "1059896166848-p8nm58nabvi6llb4805r0sv1klnup2ku.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAWfXue3H7fsVK4V6ybR2d_dMOgbyApsJ0"
+          "current_key": "AIzaSyBL_34ctS_HBQEezc77HxBmP_DGR-TeVyE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "698877920515-j7fnao4np0g52q2p567516b7nmgh3epj.apps.googleusercontent.com",
+              "client_id": "1059896166848-p8nm58nabvi6llb4805r0sv1klnup2ku.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

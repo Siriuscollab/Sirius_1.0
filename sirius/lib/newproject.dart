@@ -6,6 +6,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:sirius/homee.dart';
 class Hom extends StatefulWidget {
+  final uid;
+  Hom({this.uid});
   @override
   _HomState createState() => _HomState();
 }
@@ -14,7 +16,8 @@ class _HomState extends State<Hom> {
   final _formkey=GlobalKey<FormState>();
   String url;
   File resume;
-  final dbref=FirebaseDatabase.instance.reference().child('projects');
+  final dbref2=FirebaseDatabase.instance.reference().child('assoc');
+  final dbref=FirebaseDatabase.instance.reference().child('projects').push();
   TextEditingController pt=TextEditingController();
   TextEditingController desc=TextEditingController();
   TextEditingController size=TextEditingController();
@@ -142,15 +145,19 @@ class _HomState extends State<Hom> {
                         ),
                         onPressed: (){
                           if(_formkey.currentState.validate()){
-
-                            dbref.push().set({
+                            var key=dbref.key;
+                          dbref.set({
                               'title':pt.text,
                               'description':desc.text,
                               'groupsize':size.text,
                               'resume':url
                             });
+                            dbref2.child(widget.uid).push().set({
+                              'pid':key,
+                              'admin':1,
+                            });
                             Scaffold.of(context).showSnackBar(SnackBar(content: Text('Created Successfully'),));
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid: widget.uid,)));
                           }
                         },
                         color: Colors.blueGrey,

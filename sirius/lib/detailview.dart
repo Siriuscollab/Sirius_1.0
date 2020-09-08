@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 class detailview extends StatefulWidget {
   Map<dynamic,dynamic> list;
-  detailview({this.list});
+  dynamic keys;
+  detailview({this.list,this.keys});
   @override
   _detailviewState createState() => _detailviewState();
 }
@@ -23,6 +24,20 @@ class _detailviewState extends State<detailview> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           // mainAxisAlignment: MainAxisAlignment.center ,
           children: <Widget>[
+            Text('Project ID',
+              style: TextStyle(
+                  fontSize: 21.0,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic
+              ),
+            ),
+            Text(widget.keys,
+              style: TextStyle(
+                  fontSize: 21.0,
+                  // fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic
+              ),
+            ),
             Text('Project Title',
               style: TextStyle(
                   fontSize: 21.0,
@@ -35,7 +50,8 @@ class _detailviewState extends State<detailview> {
                   fontSize: 21.0,
                   // fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic
-              ),),
+              ),
+            ),
             Text('Project Description',
               style: TextStyle(
                   fontSize: 21.0,
