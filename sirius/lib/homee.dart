@@ -146,7 +146,7 @@ class _FireState extends State<Fire> {
                               child: Column(
                                 children: <Widget>[
                                   ListTile(
-                                    leading:Text('Project${index+1}'),
+                                    leading:Text('${lists[index]['uname']}'),
                                     title: Text(lists[index]['title']),
                                     subtitle: Text('ML,AI,Python...'),
                                   ),

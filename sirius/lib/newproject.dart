@@ -18,6 +18,7 @@ class _HomState extends State<Hom> {
   File resume;
   final dbref2=FirebaseDatabase.instance.reference().child('assoc');
   final dbref=FirebaseDatabase.instance.reference().child('projects').push();
+  final dbref3=FirebaseDatabase.instance.reference().child('users');
   TextEditingController pt=TextEditingController();
   TextEditingController desc=TextEditingController();
   TextEditingController size=TextEditingController();
@@ -143,15 +144,19 @@ class _HomState extends State<Hom> {
                         child: Text(
                             'Create'
                         ),
-                        onPressed: (){
-                          if(_formkey.currentState.validate()){
+                        onPressed: () async{
+                          if(_formkey.currentState.validate()) {
                             var key=dbref.key;
+                            DataSnapshot user=await dbref3.child(widget.uid).once();
+                            Map<dynamic,dynamic> l=user.value;
                           dbref.set({
                               'title':pt.text,
                               'description':desc.text,
                               'groupsize':size.text,
-                              'resume':url
+                              'resume':url,
+                            'uname':l['username']
                             });
+
                             dbref2.child(widget.uid).push().set({
                               'pid':key,
                               'admin':1,
