@@ -21,12 +21,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentindex=0;
-
-  final List<Widget> tabs=[
-    Text('hello'),
-    Text('hello'),
-    Text('hello')
-  ];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
