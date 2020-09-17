@@ -27,6 +27,8 @@ dependencies:
   cloud_firestore: ^0.13.7
   firebase_storage: ^3.1.5
   file_picker: ^1.13.3
+  shared_preferences: ^0.5.6+3
+  align_positioned: ^1.2.8
   flutter:
     sdk: flutter
 

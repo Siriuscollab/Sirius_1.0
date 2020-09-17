@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:sirius/homee.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class Hom extends StatefulWidget {
   final uid;
   Hom({this.uid});
@@ -22,6 +23,16 @@ class _HomState extends State<Hom> {
   TextEditingController pt=TextEditingController();
   TextEditingController desc=TextEditingController();
   TextEditingController size=TextEditingController();
+
+  Future<bool> addChatRoom2(projectRoom, projectId) {
+    Firestore.instance
+        .collection("projectRoom")
+        .document(projectId)
+        .setData(projectRoom)
+        .catchError((e) {
+      print(e);
+    });
+  }
   Future<void> uploadFile() async{
     print('ok');
     File file = await FilePicker.getFile(type: FileType.custom, allowedExtensions: ['pdf', 'doc']);
@@ -161,6 +172,18 @@ class _HomState extends State<Hom> {
                               'pid':key,
                               'admin':1,
                             });
+                                String projectId = key;
+
+                                List<String> users = [l['username']];
+
+                                Map<String, dynamic> projectRoom = {
+                                  "users": [l['username']],
+                                  "projectId": projectId,
+                                  "admin":l['username'],
+                                };
+
+                                addChatRoom2(projectRoom, projectId);
+
                             Scaffold.of(context).showSnackBar(SnackBar(content: Text('Created Successfully'),));
                             Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid: widget.uid,)));
                           }

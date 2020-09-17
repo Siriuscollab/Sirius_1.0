@@ -1,50 +1,46 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:sirius/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:intl/intl.dart';
-import 'package:sirius/people.dart';
+import 'package:align_positioned/align_positioned.dart';
+class Chat extends StatefulWidget {
 
-class Team extends StatefulWidget {
-  final String projectId;
-  final userr;
-  Team({this.projectId,this.userr});
+final String s;
+final String r;
+  Chat({this.s,this.r});
+
   @override
-  _TeamState createState() => _TeamState();
+  _ChatState createState() => _ChatState();
 }
 
-class _TeamState extends State<Team> {
+class _ChatState extends State<Chat> {
   FocusNode nod;
+  String chatRoomId;
   Stream<QuerySnapshot> chats;
-  ScrollController _controller = ScrollController();
   TextEditingController messageEditingController = new TextEditingController();
-Map<dynamic,dynamic> user_v;
-  Map<dynamic,dynamic> proj;
-  String time = DateFormat.jm().format( DateTime.now());
-  String projname;
- String myname="proj";
-  Widget chatMessages(){
+  String time = DateFormat.jm().format(DateTime.now());
+  ScrollController _controller = ScrollController();
+  Widget chatMessages() {
     return StreamBuilder(
       stream: chats,
-      builder: (context, snapshot){
-        return snapshot.hasData ?  ListView.builder(
-          padding: EdgeInsets.only(bottom: 10.0),
+      builder: (context, snapshot) {
+        return snapshot.hasData
+            ? ListView.builder(
           controller: _controller,
           scrollDirection: Axis.vertical,
-            shrinkWrap: true,
             reverse: true,
             itemCount: snapshot.data.documents.length,
-            itemBuilder: (context, index){
+            itemBuilder: (context, index) {
               return MessageTile(
                 message: snapshot.data.documents[index].data["message"],
-                sendByMe: myname == snapshot.data.documents[index].data["sendBy"],
+                sendByMe: widget.s ==
+                    snapshot.data.documents[index].data["sendBy"],
                 name: snapshot.data.documents[index].data["sendBy"],
                 time: snapshot.data.documents[index].data["time2"],
               );
-            }) : Container();
+            })
+            : Container();
       },
     );
   }
@@ -52,25 +48,19 @@ Map<dynamic,dynamic> user_v;
   addMessage() {
     if (messageEditingController.text.isNotEmpty) {
       setState(() {
-        time= DateFormat.jm().format( DateTime.now());
+        time=DateFormat.jm().format(DateTime.now());
       });
       Map<String, dynamic> chatMessageMap = {
-        "sendBy": myname,
+        "sendBy": widget.s,
         "message": messageEditingController.text,
-        'time': DateTime
-            .now()
-            .millisecondsSinceEpoch,
+        'time': DateTime.now().millisecondsSinceEpoch,
         'time2': time
       };
 
-      DatabaseMethods().addMessage2(widget.projectId, chatMessageMap);
-      print('kk');
+      DatabaseMethods().addMessage(chatRoomId, chatMessageMap);
+
       setState(() {
         messageEditingController.text = "";
-        // Timer(
-        //     Duration(milliseconds: 300),
-        //         () => _controller
-        //         .jumpTo(_controller.position.maxScrollExtent));
         FocusScopeNode currentFocus = FocusScope.of(context);
         if (!currentFocus.hasPrimaryFocus) {
           currentFocus.unfocus();
@@ -78,30 +68,15 @@ Map<dynamic,dynamic> user_v;
       });
     }
   }
+
   @override
   void initState() {
-    final dbref3=FirebaseDatabase.instance.reference().child('users');
-    final dbref4=FirebaseDatabase.instance.reference().child('projects');
-    dbref3.child(widget.userr).once().then((value1) {
-      dbref4.child(widget.projectId).once().then((value) {
-        proj=value.value;
-        user_v=value1.value;
-        DatabaseMethods().getChats2(widget.projectId).then((val) {
-          setState(() {
-            myname=user_v['username'];
-            print(user_v);
-            print(widget.userr);
-            projname=proj['title'];
-            chats = val;
-            // Timer(`
-            //     Duration(milliseconds: 300),
-            //         () => _controller
-            //         .jumpTo(_controller.position.maxScrollExtent));
-          });
-        });
+    chatRoomId=widget.s.compareTo(widget.r)==1?"${widget.s}\_${widget.r}":"${widget.r}\_${widget.s}";
+    DatabaseMethods().getChats(chatRoomId).then((val) {
+      setState(() {
+        chats = val;
       });
     });
-
     super.initState();
   }
 
@@ -109,31 +84,13 @@ Map<dynamic,dynamic> user_v;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:projname==null?Text('Loading'):Text(projname),
-        backgroundColor: Colors.grey,
-        elevation: 0.0,
-        actions: [
-          GestureDetector(
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => People(projectId: widget.projectId,user:user_v['username'])
-                    ));
-              },
-              child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(Icons.group)
-              )),
-        ],
+        title: Text(widget.r,style: TextStyle(color: Colors.white),) ,
       ),
       body: Container(
         child: Column(
           children: <Widget>[
-
-                   Expanded(
-                     child: Container(
-                         child:  chatMessages()),
-                   ),
-
+            Expanded(child:
+            Container(child: chatMessages())),
             Container(alignment: Alignment.bottomCenter,
               width: MediaQuery
                   .of(context)
@@ -179,7 +136,7 @@ Map<dynamic,dynamic> user_v;
                           ),
                           padding: EdgeInsets.all(12),
                           child: Icon(
-                            Icons.send
+                              Icons.send
                           )),
                     ),
                   ],
@@ -242,18 +199,26 @@ class _MessageTileState extends State<MessageTile> {
             )
         ),
         child: Column(
-
-          children: [
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
             widget.sendByMe? SizedBox(width: 0.0,height: 0.0,):Text(widget.name,
-              style: TextStyle(color: Colors.white,
-                  fontSize: 12),),
-            Text("${widget.message}\n ${widget.time}",
+              style: TextStyle(color: Colors.greenAccent,
+                  fontSize: 14,
+              fontWeight: FontWeight.bold
+              ),),
+            Text("${widget.message}",
                 //textAlign: TextAlign.left,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontFamily: 'OverpassRegular',
                     fontWeight: FontWeight.w300)),
+Text(widget.time,
+style: TextStyle(
+  fontSize: 9.0
+),
+)
           ],
         ),
 
@@ -261,3 +226,48 @@ class _MessageTileState extends State<MessageTile> {
     );
   }
 }
+// class MessageTile extends StatelessWidget {
+//   final String message;
+//   final bool sendByMe;
+//   final String name;
+//   final String time;
+//
+//   MessageTile(
+//       {@required this.message, @required this.sendByMe, @required this.name, @required this.time});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: EdgeInsets.only(
+//           top: 8, bottom: 8, left: sendByMe ? 0 : 24, right: sendByMe ? 24 : 0),
+//       alignment: sendByMe ? Alignment.centerRight : Alignment.centerLeft,
+//       child: Container(
+//         margin:
+//         sendByMe ? EdgeInsets.only(left: 30) : EdgeInsets.only(right: 30),
+//         padding: EdgeInsets.only(top: 17, bottom: 17, left: 20, right: 20),
+//         decoration: BoxDecoration(
+//             borderRadius: sendByMe
+//                 ? BorderRadius.only(
+//                 topLeft: Radius.circular(23),
+//                 topRight: Radius.circular(23),
+//                 bottomLeft: Radius.circular(23))
+//                 : BorderRadius.only(
+//                 topLeft: Radius.circular(23),
+//                 topRight: Radius.circular(23),
+//                 bottomRight: Radius.circular(23)),
+//             gradient: LinearGradient(
+//               colors: sendByMe
+//                   ? [const Color(0xff4e342e), const Color(0xff3e2723)]
+//                   : [const Color(0x1AFFFFFF), const Color(0x1AFFFFFF)],
+//             )),
+//         child: Text("${message}\n${time}",
+//             textAlign: TextAlign.start,
+//             style: TextStyle(
+//                 color: Colors.white,
+//                 fontSize: 16,
+//                 fontFamily: 'OverpassRegular',
+//                 fontWeight: FontWeight.w300)),
+//       ),
+//     );
+//   }
+// }
