@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path/path.dart' as Path;
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:sirius/newproject.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sirius/detailview.dart';
+import 'package:sirius/team.dart';
 // import 'package:sirius/Myprojects.dart';
 // import 'package:sirius/hub.dart';
 // import 'package:sirius/profile.dart';
@@ -21,12 +23,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _currentindex=0;
-
-  final List<Widget> tabs=[
-    Text('hello'),
-    Text('hello'),
-    Text('hello')
-  ];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,12 +44,16 @@ class _FireState extends State<Fire> {
   final _formkey=GlobalKey<FormState>();
   String url;
   File resume;
+  String name,email,phone;
   final dbref=FirebaseDatabase.instance.reference().child('projects');
   final dbref2=FirebaseDatabase.instance.reference().child('assoc');
+  final db=FirebaseDatabase.instance.reference().child('users');
   TextEditingController pt=TextEditingController();
   TextEditingController desc=TextEditingController();
   TextEditingController size=TextEditingController();
   var pname1=[];
+  Map<dynamic, dynamic> values1=new Map<dynamic,dynamic>();
+  Map<dynamic,dynamic> ud;
   Future<void> uploadFile() async{
     print('ok');
     File file = await FilePicker.getFile(type: FileType.custom, allowedExtensions: ['pdf', 'doc']);
@@ -71,7 +71,20 @@ class _FireState extends State<Fire> {
   final lists=[];
   final keys=[];
   var up=[];
+
   var _index=0;
+  @override
+  void initState(){
+    values1=new Map<dynamic,dynamic>();
+    db.child(widget.uid).once().then((value) {
+      ud=value.value;
+      setState(() {
+        name=ud['username'];
+        phone=ud['phone'];
+        email=ud['email'];
+      });
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +113,7 @@ class _FireState extends State<Fire> {
             stream: dbref.onValue,
             builder: (context,AsyncSnapshot<Event> snapshot){
               if(snapshot.hasData){
-                Map<dynamic, dynamic> values1;
+                print(snapshot.data.snapshot.value.length);
                 var lp=[];
                 lists.clear();
                 lp.clear();
@@ -108,6 +121,9 @@ class _FireState extends State<Fire> {
                 // values.forEach((key, value) { lists.add(value);});
                 dbref2.child(widget.uid).once().then((value) {
                   values1=value.value;
+                  if(values1==null){
+                   return Text('Loading');
+                  }
                   values1.forEach((key, value) {
                     lp.add(value['pid']);
                   });
@@ -122,6 +138,7 @@ class _FireState extends State<Fire> {
                   keys.add(key);
                 });
                 return  ListView.builder(
+
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     itemCount: lists.length,
@@ -146,7 +163,7 @@ class _FireState extends State<Fire> {
                               child: Column(
                                 children: <Widget>[
                                   ListTile(
-                                    leading:Text('Project${index+1}'),
+                                    leading:Text('${lists[index]['uname']}'),
                                     title: Text(lists[index]['title']),
                                     subtitle: Text('ML,AI,Python...'),
                                   ),
@@ -164,8 +181,15 @@ class _FireState extends State<Fire> {
                                           onPressed: () async{
                                             FirebaseUser user= await FirebaseAuth.instance.currentUser();
                                             final dbref1=FirebaseDatabase.instance.reference().child('assoc');
+                                            final dbref2=FirebaseDatabase.instance.reference().child('users');
+                                            DataSnapshot spp=await dbref2.child(widget.uid).once();
+                                            Map<dynamic,dynamic> usr=spp.value;
+                                            print('${usr} okra');
+                                            Firestore.instance
+                                                .collection('projectRoom').document(keys[index])
+                                                .updateData({'users':FieldValue.arrayUnion([usr['username']])});
                                             dbref1.child(widget.uid)
-                                                .push().set({'pid': keys[index],
+                                                .push().set({'pid':keys[index],
                                               'admin':0
                                             });
                                           },
@@ -190,9 +214,15 @@ class _FireState extends State<Fire> {
             },
           ),
             StreamBuilder(
-              stream: dbref2.onValue,
+              stream: dbref2.child(widget.uid).onValue,
               builder: (context,AsyncSnapshot<Event> snapshot) {
                 if(snapshot.hasData){
+                print(snapshot.data.snapshot.value==null);
+                if(snapshot.data.snapshot.value==null){
+                  return Text('Not Joined In Any Projects!!');
+                }
+                else{
+                print('ok');
                   var list=[];
                   var list2=[];
                   var admin=[];
@@ -205,22 +235,25 @@ class _FireState extends State<Fire> {
                   // values.forEach((key, value) { lists.add(value);});
                   DataSnapshot dataValues = snapshot.data.snapshot;
                   Map<dynamic, dynamic> values = dataValues.value;
-                  Map<dynamic,dynamic> val;
+                  Map<dynamic,dynamic> val=new Map<dynamic,dynamic>();
                   Map<dynamic,dynamic> val1;
-
-                  values.forEach((key, values) {
-                    if(key==widget.uid){
-                      val1=values;
-                      val1.forEach((key, value) {
-                        list2.add(value['pid']);
-                        admin.add(value['admin']);
-                      });
-                    }
+                values.forEach((key, value) {
+                  list2.add(value['pid']);
+                  admin.add(value['admin']);
+                });
+                  // values.forEach((key, values) {
+                  //   if(key==widget.uid){
+                  //     val1=values;
+                  //     val1.forEach((key, value) {
+                  //       list2.add(value['pid']);
+                  //       admin.add(value['admin']);
+                  //     });
+                  //   }
                     // list.add(values);
                     // // print('${key} and ${widget.uid}');
                     // values['userid']==widget.uid?list2.add(values['pid']):print('not equal');
                     // print(widget.uid);
-                  });
+                  // });
                   list2.forEach((element) {
                     dbref.orderByKey().equalTo(element).once().then((value) {
                       val=value.value;
@@ -266,7 +299,9 @@ class _FireState extends State<Fire> {
                                           FlatButton(
                                             child: Text('Chat Room'),
                                             onPressed: () {
-
+                                            Navigator.push(context, MaterialPageRoute(
+                                              builder: (context)=>Team(projectId:list2[index1],userr:widget.uid)
+                                            ));
                                             },
                                           ),
                                           FlatButton(
@@ -284,11 +319,18 @@ class _FireState extends State<Fire> {
                         );
                       }
                   );
-                }
+                }}
                 return Center(child: CircularProgressIndicator());
               },
             ),
-            Text('Profile'),
+            Column(
+              children: <Widget>[
+                Text('username'),
+                name==null?Text('name'):Text(name),
+                Text('Email'),
+                email==null?Text('email'):Text(email)
+              ],
+            )
           ]
       ),
       bottomNavigationBar: BottomNavigationBar(

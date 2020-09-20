@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:sirius/homee.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class Hom extends StatefulWidget {
   final uid;
   Hom({this.uid});
@@ -18,9 +19,20 @@ class _HomState extends State<Hom> {
   File resume;
   final dbref2=FirebaseDatabase.instance.reference().child('assoc');
   final dbref=FirebaseDatabase.instance.reference().child('projects').push();
+  final dbref3=FirebaseDatabase.instance.reference().child('users');
   TextEditingController pt=TextEditingController();
   TextEditingController desc=TextEditingController();
   TextEditingController size=TextEditingController();
+
+  Future<bool> addChatRoom2(projectRoom, projectId) {
+    Firestore.instance
+        .collection("projectRoom")
+        .document(projectId)
+        .setData(projectRoom)
+        .catchError((e) {
+      print(e);
+    });
+  }
   Future<void> uploadFile() async{
     print('ok');
     File file = await FilePicker.getFile(type: FileType.custom, allowedExtensions: ['pdf', 'doc']);
@@ -143,19 +155,35 @@ class _HomState extends State<Hom> {
                         child: Text(
                             'Create'
                         ),
-                        onPressed: (){
-                          if(_formkey.currentState.validate()){
+                        onPressed: () async{
+                          if(_formkey.currentState.validate()) {
                             var key=dbref.key;
+                            DataSnapshot user=await dbref3.child(widget.uid).once();
+                            Map<dynamic,dynamic> l=user.value;
                           dbref.set({
                               'title':pt.text,
                               'description':desc.text,
                               'groupsize':size.text,
-                              'resume':url
+                              'resume':url,
+                            'uname':l['username']
                             });
+
                             dbref2.child(widget.uid).push().set({
                               'pid':key,
                               'admin':1,
                             });
+                                String projectId = key;
+
+                                List<String> users = [l['username']];
+
+                                Map<String, dynamic> projectRoom = {
+                                  "users": [l['username']],
+                                  "projectId": projectId,
+                                  "admin":l['username'],
+                                };
+
+                                addChatRoom2(projectRoom, projectId);
+
                             Scaffold.of(context).showSnackBar(SnackBar(content: Text('Created Successfully'),));
                             Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid: widget.uid,)));
                           }
