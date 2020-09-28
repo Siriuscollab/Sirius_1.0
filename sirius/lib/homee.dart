@@ -89,7 +89,9 @@ class _FireState extends State<Fire> {
   final lists=[];
   final keys=[];
   var up=[];
-
+  var l1=[];
+  final dbref3=FirebaseDatabase.instance.reference().child('requests1');
+  final dbref4=FirebaseDatabase.instance.reference().child('sentrequests');
   var _index=0;
   @override
   void initState(){
@@ -204,26 +206,17 @@ class _FireState extends State<Fire> {
 
                                       },
                                     ):  FlatButton(
-                                      child: Text('Join'),
+                                      child:  l1.contains(keys[index])?Text('Requeted'):Text('Join'),
                                       onPressed: () async{
-                                        FirebaseUser user= await FirebaseAuth.instance.currentUser();
-                                        final dbref1=FirebaseDatabase.instance.reference().child('assoc');
-                                        final dbref2=FirebaseDatabase.instance.reference().child('users');
-                                        DataSnapshot spp=await dbref2.child(widget.uid).once();
-                                        Map<dynamic,dynamic> usr=spp.value;
-
-                                        Firestore.instance
-                                            .collection('projectRoom').document(keys[index])
-                                            .updateData({'users':FieldValue.arrayUnion([usr['username']])});
-                                        dbref1.child(widget.uid)
-                                            .child(keys[index]).set({
-                                          'admin':0
+                                        String c_pid=keys[index];
+                                        String p_uid;
+                                        await dbref.child(c_pid).child('uid').once()
+                                            .then((snapshot){p_uid=snapshot.value;});
+                                        await dbref3.child(p_uid).child(c_pid).push().set(widget.uid);
+                                        await dbref4.child(widget.uid).child(c_pid).push().set(p_uid);
+                                        setState(() {
+                                          l1.add(c_pid);
                                         });
-                                        dr.child(lists[index]['uid']).child(keys[index]).child(widget.uid).set({
-                                          'accept':0
-                                        });
-                                        Firestore.instance.collection("projectRoom")
-                                            .document(keys[index]).collection('devtokens').document(widget.token).setData({'token':widget.token});
                                       },
                                     ),
                                     FlatButton(
