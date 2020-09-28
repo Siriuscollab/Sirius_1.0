@@ -165,11 +165,11 @@ class _HomState extends State<Hom> {
                               'description':desc.text,
                               'groupsize':size.text,
                               'resume':url,
-                            'uname':l['username']
+                            'uname':l['username'],
+                            'uid':widget.uid
                             });
 
-                            dbref2.child(widget.uid).push().set({
-                              'pid':key,
+                            dbref2.child(widget.uid).child(key).set({
                               'admin':1,
                             });
                                 String projectId = key;

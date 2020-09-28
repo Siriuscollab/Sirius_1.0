@@ -5,7 +5,7 @@ import 'package:sirius/autenticate.dart';
 import 'package:sirius/sign_in.dart';
 void main() => runApp(MaterialApp(
   routes: {
-    '/': (context) => Authenticate(),
+    '/': (context) => SignIn(),
     '/signin': (context) => SignIn(),
   },
 ));

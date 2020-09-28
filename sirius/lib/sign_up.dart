@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:sirius/phone.dart';
@@ -122,8 +123,10 @@ class _SignUpState extends State<SignUp> {
             });
           }
           Phoneauth();
-          Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Home(uid: user.uid)));
+          FirebaseMessaging _messaging= FirebaseMessaging();
+          _messaging.getToken().then((token){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid:user.uid,token:token)));
+            });
         }
       }catch(e){
         print(e.message);
@@ -185,6 +188,7 @@ class _SignUpState extends State<SignUp> {
                         FirebaseUser user = result.user;
 
                         if(user != null){
+
                           Navigator.push(context, MaterialPageRoute(
                               builder: (context) => Home()
                           ));
