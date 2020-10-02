@@ -31,6 +31,7 @@ dependencies:
   align_positioned: ^1.2.8
   flappy_search_bar: ^1.7.2
   firebase_messaging: ^6.0.16
+  jitsi_meet: ^0.4.2
   flutter:
     sdk: flutter
 

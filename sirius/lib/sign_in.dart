@@ -14,6 +14,7 @@ class _SignInState extends State<SignIn> {
   bool isLoading =false;
   String _email, _password;
   final dbref2=FirebaseDatabase.instance.reference().child('assoc');
+  final dbref3=FirebaseDatabase.instance.reference().child('requested');
   final GlobalKey<FormState> _formkey= GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -85,15 +86,28 @@ class _SignInState extends State<SignIn> {
       try{
         FirebaseUser user = (await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password)).user;
         FirebaseMessaging _messaging= FirebaseMessaging();
-        _messaging.getToken().then((token){
+        _messaging.getToken().then((token) async {
           print('hello'+token+'end');
+          DataSnapshot asp= await dbref3.child(user.uid).once();
+          Map<dynamic,dynamic> mpp=asp.value;
+          if(mpp!=null){
+          mpp.forEach((key, value) {
+              dbref3.child(user.uid).child(key).child(token).set({
+                'requested':1
+              });
+          });}
           dbref2.child(user.uid).once().then((value) {
+            if(value.value==null){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid:user.uid,token:token)));
+            }
+            else{
             Map<dynamic,dynamic> vall=value.value;
           vall.forEach((key, value) {
             Firestore.instance.collection("projectRoom")
                 .document(key).collection('devtokens').document(token).setData({'token':token});
           });
-            Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid:user.uid,token:token)));
+          print(token);
+            Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid:user.uid,token:token)));}
           });
         });
       }catch(e){

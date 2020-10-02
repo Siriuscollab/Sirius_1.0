@@ -8,7 +8,8 @@ import 'package:sirius/homee.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 class Hom extends StatefulWidget {
   final uid;
-  Hom({this.uid});
+  final token;
+  Hom({this.uid,this.token});
   @override
   _HomState createState() => _HomState();
 }
@@ -20,6 +21,7 @@ class _HomState extends State<Hom> {
   final dbref2=FirebaseDatabase.instance.reference().child('assoc');
   final dbref=FirebaseDatabase.instance.reference().child('projects').push();
   final dbref3=FirebaseDatabase.instance.reference().child('users');
+  final pu=FirebaseDatabase.instance.reference().child('proj_users');
   TextEditingController pt=TextEditingController();
   TextEditingController desc=TextEditingController();
   TextEditingController size=TextEditingController();
@@ -181,11 +183,16 @@ class _HomState extends State<Hom> {
                                   "projectId": projectId,
                                   "admin":l['username'],
                                 };
-
+                            final pu=FirebaseDatabase.instance.reference().child('proj_users');
+                            pu.child(projectId).child(widget.uid).set({
+                              'joined':1
+                            });
+                            Firestore.instance.collection("projectRoom")
+                                .document(projectId).collection('devtokens').document(key).setData({'token':widget.token});
                                 addChatRoom2(projectRoom, projectId);
 
                             Scaffold.of(context).showSnackBar(SnackBar(content: Text('Created Successfully'),));
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid: widget.uid,)));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid: widget.uid,token: widget.token,)));
                           }
                         },
                         color: Colors.blueGrey,
