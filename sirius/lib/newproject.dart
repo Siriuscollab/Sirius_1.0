@@ -188,7 +188,7 @@ class _HomState extends State<Hom> {
                               'joined':1
                             });
                             Firestore.instance.collection("projectRoom")
-                                .document(projectId).collection('devtokens').document(key).setData({'token':widget.token});
+                                .document(projectId).collection('devtokens').document(widget.token).setData({'token':widget.token});
                                 addChatRoom2(projectRoom, projectId);
 
                             Scaffold.of(context).showSnackBar(SnackBar(content: Text('Created Successfully'),));

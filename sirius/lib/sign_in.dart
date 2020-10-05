@@ -5,6 +5,7 @@ import 'package:sirius/homee.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sirius/sign_up.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:sirius/helper/helperfunctions.dart';
 class SignIn extends StatefulWidget {
   @override
   _SignInState createState() => _SignInState();
@@ -15,6 +16,7 @@ class _SignInState extends State<SignIn> {
   String _email, _password;
   final dbref2=FirebaseDatabase.instance.reference().child('assoc');
   final dbref3=FirebaseDatabase.instance.reference().child('requested');
+  final dbref=FirebaseDatabase.instance.reference().child('users');
   final GlobalKey<FormState> _formkey= GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -86,8 +88,12 @@ class _SignInState extends State<SignIn> {
       try{
         FirebaseUser user = (await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password)).user;
         FirebaseMessaging _messaging= FirebaseMessaging();
+        DataSnapshot use_r=await dbref.child(user.uid).once();
+        Map<dynamic,dynamic> use_det=use_r.value;
         _messaging.getToken().then((token) async {
           print('hello'+token+'end');
+          Firestore.instance.collection(use_det['username'])
+              .document(token).setData({'token':token});
           DataSnapshot asp= await dbref3.child(user.uid).once();
           Map<dynamic,dynamic> mpp=asp.value;
           if(mpp!=null){
@@ -98,7 +104,11 @@ class _SignInState extends State<SignIn> {
           });}
           dbref2.child(user.uid).once().then((value) {
             if(value.value==null){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid:user.uid,token:token)));
+              HelperFunctions.saveUserLoggedInSharedPreference(true);
+              HelperFunctions.saveUserToken(token);
+              HelperFunctions.saveUserNameSharedPreference(
+                  user.uid);
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home(uid:user.uid,token:token)));
             }
             else{
             Map<dynamic,dynamic> vall=value.value;
@@ -106,8 +116,13 @@ class _SignInState extends State<SignIn> {
             Firestore.instance.collection("projectRoom")
                 .document(key).collection('devtokens').document(token).setData({'token':token});
           });
+
+            HelperFunctions.saveUserLoggedInSharedPreference(true);
+          HelperFunctions.saveUserToken(token);
+            HelperFunctions.saveUserNameSharedPreference(
+               user.uid);
           print(token);
-            Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid:user.uid,token:token)));}
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home(uid:user.uid,token:token)));}
           });
         });
       }catch(e){

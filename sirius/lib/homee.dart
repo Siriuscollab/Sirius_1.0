@@ -5,11 +5,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sirius/newproject.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sirius/detailview.dart';
 import 'package:sirius/prof.dart';
 import 'package:sirius/requests.dart';
+import 'package:sirius/sign_in.dart';
 import 'package:sirius/team.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 
@@ -146,7 +148,31 @@ class _FireState extends State<Fire> {
                       Hom(uid: widget.uid, token: widget.token)));
         },
       ),
-      appBar: AppBar(
+      appBar: _index==3?AppBar(
+        title: Text(
+          'Profile',
+        ),
+        centerTitle: true,
+        titleSpacing: 1.0,
+        backgroundColor: Colors.blueGrey,
+        elevation: 0,
+        actions: [
+          GestureDetector(
+              onTap: () async{
+                final FirebaseAuth _auth = FirebaseAuth.instance;
+                _auth.signOut();
+                SharedPreferences preferences=await SharedPreferences.getInstance();
+                preferences.clear();
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                  return SignIn();
+                }));
+              },
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(Icons.exit_to_app)
+              )),
+        ],
+      ):AppBar(
         title: Text(
           'Projects',
         ),
@@ -192,10 +218,10 @@ class _FireState extends State<Fire> {
                       joined.clear();
                       if(snapshot2.hasData){
                         if(snapshot2.data.snapshot.value==null){
-
+lists.clear();
                         }
                         else{
-
+                          lists.clear();
                           DataSnapshot join=snapshot2.data.snapshot;
                           Map<dynamic,dynamic> jon=join.value;
                           jon.forEach((key, value) {
@@ -208,6 +234,7 @@ class _FireState extends State<Fire> {
                           lists.add(values1);
                           keys.add(key);
                         });
+                        print(lists.length);
                         return ListView.builder(
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
@@ -639,15 +666,49 @@ class _FireState extends State<Fire> {
             return Center(child: CircularProgressIndicator());
           },
         ),
-        Center(
-          child: RaisedButton(
-            child: Text('Requests'),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return Numb(uid: widget.uid);
-              }));
-            },
-          ),
+        Column(
+          children: [
+            RaisedButton(
+                child: Text('Requests'),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return Numb(uid: widget.uid);
+                  }));
+                },
+              ),
+            RaisedButton(
+              child: Text('Sign Out'),
+              onPressed: () async{
+                DataSnapshot user_pro=await dbref2.child(widget.uid).once();
+                Map<dynamic,dynamic> u_pro=user_pro.value;
+                DataSnapshot user_req=await usent.child(widget.uid).once();
+                Map<dynamic,dynamic> u_req=user_pro.value;
+                if(u_req!=null){
+                u_req.forEach((key, value) async {
+                  await usent.child(widget.uid).child(key).child(widget.token).remove();
+                });}
+                if(u_pro!=null){
+                u_pro.forEach((key, value) async {
+                  await usent.child(widget.uid).child(key).child(widget.token).remove();
+                  await Firestore.instance
+                      .collection('projectRoom')
+                      .document(key).collection('devtokens').document(widget.token)
+                      .delete();
+                  await Firestore.instance
+                      .collection(name)
+                      .document(widget.token)
+                      .delete();
+                });}
+                final FirebaseAuth _auth = FirebaseAuth.instance;
+                _auth.signOut();
+                SharedPreferences preferences=await SharedPreferences.getInstance();
+                preferences.clear();
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                  return SignIn();
+                }));
+              },
+            )
+          ],
         )
       ]),
       bottomNavigationBar: BottomNavigationBar(

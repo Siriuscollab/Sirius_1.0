@@ -77,7 +77,8 @@ Map<dynamic,dynamic> user_v;
         'time': DateTime
             .now()
             .millisecondsSinceEpoch,
-        'time2': time
+        'time2': time,
+        'uid':widget.userr
       };
 
       DatabaseMethods().addMessage2(widget.projectId, chatMessageMap);
