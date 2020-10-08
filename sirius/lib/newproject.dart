@@ -192,7 +192,7 @@ class _HomState extends State<Hom> {
                                 addChatRoom2(projectRoom, projectId);
 
                             Scaffold.of(context).showSnackBar(SnackBar(content: Text('Created Successfully'),));
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Home(uid: widget.uid,token: widget.token,)));
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home(uid: widget.uid,token: widget.token,)));
                           }
                         },
                         color: Colors.blueGrey,

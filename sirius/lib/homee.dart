@@ -49,6 +49,7 @@ class _FireState extends State<Fire> {
   final _formkey = GlobalKey<FormState>();
   String url;
   File resume;
+
   String name, email, phone;
   final dbref = FirebaseDatabase.instance.reference().child('projects');
   final dbref2 = FirebaseDatabase.instance.reference().child('assoc');

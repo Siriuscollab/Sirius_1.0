@@ -15,6 +15,7 @@ import 'package:jitsi_meet/jitsi_meet.dart';
 import 'package:jitsi_meet/jitsi_meeting_listener.dart';
 import 'package:jitsi_meet/room_name_constraint.dart';
 import 'package:jitsi_meet/room_name_constraint_type.dart';
+import 'package:sirius/ui/lazy_list.dart';
 class Team extends StatefulWidget {
   final String projectId;
   final userr;
@@ -268,7 +269,7 @@ Map<dynamic,dynamic> user_v;
 
                    Expanded(
                      child: Container(
-                         child:  chatMessages()),
+                         child:  LazyListScreen(pid: widget.projectId,uid:widget.userr)),
                    ),
 
             Container(alignment: Alignment.bottomCenter,
