@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:sirius/helper/authenticate.dart';
 import 'package:sirius/helper/helperfunctions.dart';
@@ -20,6 +21,7 @@ class _MyAppState extends State<MyApp> {
   final FirebaseMessaging _fcm = FirebaseMessaging();
   bool userIsLoggedIn=false;
   String uid;
+  final dbref = FirebaseDatabase.instance.reference().child('projects');
   String token;
   final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>(); // To be used as navigator
   @override
@@ -57,10 +59,12 @@ class _MyAppState extends State<MyApp> {
   handleClickedNotification(message) async {
     // Put your logic here before redirecting to your material page route if you want too
     uid=await HelperFunctions.getUserNameSharedPreference();
+    DataSnapshot spp=await dbref.child(message['data']['pid']).once();
+    Map<dynamic,dynamic> pn=spp.value;
     navigatorKey.currentState.pushReplacement(MaterialPageRoute(builder: (context) => Team(
         projectId:
         message['data']['pid'],
-        userr: uid)));
+        userr: uid,pname: pn['title'],)));
   }
   @override
   Widget build(BuildContext context) {

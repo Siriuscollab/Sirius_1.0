@@ -19,7 +19,8 @@ import 'package:sirius/ui/lazy_list.dart';
 class Team extends StatefulWidget {
   final String projectId;
   final userr;
-  Team({this.projectId,this.userr});
+  final pname;
+  Team({this.projectId,this.userr,this.pname});
   @override
   _TeamState createState() => _TeamState();
 }
@@ -239,7 +240,7 @@ Map<dynamic,dynamic> user_v;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:projname==null?Text('Loading'):Text(projname),
+        title:Text(widget.pname),
         backgroundColor: Colors.grey,
         elevation: 0.0,
         actions: [

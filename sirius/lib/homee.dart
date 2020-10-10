@@ -607,13 +607,14 @@ lists.clear();
                                         FlatButton(
                                           child: Text('Chat Room'),
                                           onPressed: () {
+
                                             Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) => Team(
                                                         projectId:
                                                             list2[index1],
-                                                        userr: widget.uid)));
+                                                        userr: widget.uid,pname:pname1[index1]['title'])));
                                           },
                                         ),
                                         FlatButton(
